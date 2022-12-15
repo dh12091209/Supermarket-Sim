@@ -1,4 +1,6 @@
 import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class CustomerFactory extends Thread{
 
@@ -6,11 +8,14 @@ public class CustomerFactory extends Thread{
     private long chance;
     private long nextAttempt;
     private ArrayList<Customer> customers;
-    private ArrayList<Cashiers> cashiers = new ArrayList<>();
+    private ConcurrentLinkedQueue<Customer> customerCheck = new ConcurrentLinkedQueue<Customer>();
+    private ArrayList<Cashiers> cashiers = new ArrayList<Cashiers>();
     private long runTime;
     private int numCashiers;
     private long waitCashier;
     private int totalCustomer = 0;
+    private ArrayList<Cashiers> running = new ArrayList<Cashiers>();
+
 
     public CustomerFactory(long timeSlice, long chance,ArrayList<Customer> customers,long runTime, int numCashiers, long waitCashier){
         this.timeSlice= timeSlice;
@@ -19,7 +24,7 @@ public class CustomerFactory extends Thread{
         this.runTime = runTime;
         this.numCashiers = numCashiers;
         this.waitCashier = waitCashier;
-        for(int i =1; i<=numCashiers;i++){
+        for(int i =0; i<numCashiers;i++){
             cashiers.add(new Cashiers(waitCashier,i));
         }
         nextAttempt = System.currentTimeMillis() + this.timeSlice;
@@ -44,20 +49,20 @@ public class CustomerFactory extends Thread{
                 nextAttempt = System.currentTimeMillis() + timeSlice;
             }
             for(int i =0; i<customers.size(); i++){
-                for(int j =0; j<numCashiers; j++){
-                    Customer cs = customers.get(i);
-                    if(cashiers.get(j).isAlive()){
-                       break;
-                    }
-                    Cashiers ca = cashiers.get(j);
-                    if(!cs.isAlive()&&!ca.isAlive()){
-                        ca.setCustomer(cs);
-                        customers.remove(i);
-                        ca.start();
-                    }
+                if(!customers.get(i).isAlive()){
+                    customerCheck.add(customers.get(i));
+                    customers.remove(i);
                 }
-
             }
+            
+//            for(int j =0; j<customerCheck.size(); j++){
+//                for(int x = 0; x<cashiers.size(); x++){
+//                    if(!cashiers.get(x).isAlive()){
+//                        cashiers.get(x).setCustomer(customerCheck.poll());
+//                        cashiers.get(x).start();
+//                    }
+//                }
+//            }
         }
         
     }
