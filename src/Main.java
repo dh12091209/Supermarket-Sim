@@ -5,7 +5,7 @@ public class Main {
         ArrayList<Customer> customers = new ArrayList<>();
 
 
-        CustomerFactory customerFactory = new CustomerFactory(5000,50,customers,100000,2,3000);
+        CustomerFactory customerFactory = new CustomerFactory(5000,50,customers,50000,2,3000);
         customerFactory.start();
 
     }

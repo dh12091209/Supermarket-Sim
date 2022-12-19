@@ -43,6 +43,10 @@ public class Cashiers extends Thread{
         this.jobDone = true;
     }
 
+    public long getWaitTime() {
+        return waitTime;
+    }
+
     @Override
     public String toString(){
         return "Cashier " + cashierID;

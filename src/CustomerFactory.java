@@ -13,6 +13,8 @@ public class CustomerFactory extends Thread{
     private long runTime;
     private int numCashiers;
     private long waitCashier;
+    private long totalShopTime;
+    private int totalFinishCustomer = 0;
     private int totalCustomer = 0;
     private ArrayList<Cashiers> running = new ArrayList<Cashiers>();
 
@@ -66,6 +68,8 @@ public class CustomerFactory extends Thread{
                 if(!customers.get(i).isAlive()){
 //                    System.out.println(customers.get(i).toString() + " is moved to Queue");
                     customerCheck.add(customers.get(i));
+                    totalShopTime += customers.get(i).getShopTime();
+                    totalFinishCustomer++;
                     customers.remove(i);
                 }
             }
@@ -96,7 +100,13 @@ public class CustomerFactory extends Thread{
         // In order to stop Cashier thread
         for(Cashiers cashier : cashiers){
             cashier.setJobDone(true);
-        }        
+        }
+        System.out.println(totalCustomer);//Total customers
+        System.out.println(numCashiers);//Total number of Cashiers used
+        System.out.println(totalShopTime/totalFinishCustomer);//Average shop time per customer
+        System.out.println();//Average process time per customer
+        System.out.println();//Average wait time in the Queue per customer
+        System.out.println();//Average down-time per Cashier
 
     }
 }
