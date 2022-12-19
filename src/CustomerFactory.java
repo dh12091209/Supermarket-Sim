@@ -17,6 +17,7 @@ public class CustomerFactory extends Thread{
     private ArrayList<Cashiers> running = new ArrayList<Cashiers>();
 
 
+    //  CustomerFactory(5000,50,customers,100000,3,3000);
     public CustomerFactory(long timeSlice, long chance,ArrayList<Customer> customers,long runTime, int numCashiers, long waitCashier){
         this.timeSlice= timeSlice;
         this.chance = chance;
@@ -24,8 +25,19 @@ public class CustomerFactory extends Thread{
         this.runTime = runTime;
         this.numCashiers = numCashiers;
         this.waitCashier = waitCashier;
+        // for(int i =0; i<numCashiers;i++){
+        //     Cashiers cc = new Cashiers(waitCashier,i);
+        //     //cashiers.add(new Cashiers(waitCashier,i));
+        //     cashiers.add(cc);
+        //     //cc.start();
+        // }
+
         for(int i =0; i<numCashiers;i++){
-            cashiers.add(new Cashiers(waitCashier,i));
+            Cashiers cc = new Cashiers(customerCheck, waitCashier,i);
+            //cashiers.add(new Cashiers(waitCashier,i));
+            cashiers.add(cc);
+            cc.start();
+
         }
         nextAttempt = System.currentTimeMillis() + this.timeSlice;
     }
@@ -35,7 +47,7 @@ public class CustomerFactory extends Thread{
         long start = System.currentTimeMillis();
         System.out.println();
         while( System.currentTimeMillis() - start < runTime){
-            if(nextAttempt<System.currentTimeMillis()){
+                if(nextAttempt<System.currentTimeMillis()){
                 long randNum = (long)(1+Math.random() * 100);
                 if(randNum <=chance){
                     System.out.println("make customer");
@@ -48,22 +60,43 @@ public class CustomerFactory extends Thread{
                 }
                 nextAttempt = System.currentTimeMillis() + timeSlice;
             }
+
+            // ArrayList<Customer> customers
             for(int i =0; i<customers.size(); i++){
                 if(!customers.get(i).isAlive()){
+//                    System.out.println(customers.get(i).toString() + " is moved to Queue");
                     customerCheck.add(customers.get(i));
                     customers.remove(i);
                 }
             }
-            
-//            for(int j =0; j<customerCheck.size(); j++){
-//                for(int x = 0; x<cashiers.size(); x++){
-//                    if(!cashiers.get(x).isAlive()){
-//                        cashiers.get(x).setCustomer(customerCheck.poll());
-//                        cashiers.get(x).start();
-//                    }
-//                }
-//            }
+            // Queue<Customer> customerCheck
+        //     for(int j =0; j<customerCheck.size(); j++){
+        //         System.out.println("Assign customer to cashier ");
+        //         //ArrayList<Cashiers> cashiers
+        //         for(int x = 0; x<cashiers.size(); x++){
+        //            if(!cashiers.get(x).isAlive()){
+        //                 //System.out.println(cashiers.get(x).toString() + " is available");
+        //                 // try {
+        //                 //     cashiers.get(x).join();
+        //                 // } catch(InterruptedException ie){}
+        //                 Customer nxtCustomer = customerCheck.poll();
+        //                 if (nxtCustomer != null) { 
+        //                     cashiers.get(x).setCustomer(nxtCustomer);
+        //                     cashiers.get(x).start();  // <- call twice causes IllegalThreadStateException
+        //                     //cashiers.get(x).run();
+        //                     System.out.println(cashiers.get(x).toString() + " will take " + nxtCustomer.toString());
+        //                 }
+
+
+        //            }
+        //        }
+        //    }
         }
         
+        // In order to stop Cashier thread
+        for(Cashiers cashier : cashiers){
+            cashier.setJobDone(true);
+        }        
+
     }
 }
