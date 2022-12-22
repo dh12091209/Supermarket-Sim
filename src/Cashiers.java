@@ -6,6 +6,8 @@ public class Cashiers extends Thread{
     private long waitTime;
     private int cashierID;
     private boolean jobDone = false;
+    private long downTime=0;
+    private int gotCustomer=0;
 
     private ConcurrentLinkedQueue<Customer> customerCheck;
 
@@ -24,12 +26,15 @@ public class Cashiers extends Thread{
 
     @Override
     public void run(){
-
         while (!jobDone) {
             Customer customer;
             while ((customer = customerCheck.poll()) != null) {
+                customer.endWait();
+                gotCustomer ++;
+                downTime -= System.currentTimeMillis();
                 while(customer.getLeaveTime() + waitTime > System.currentTimeMillis()){
                 }
+                downTime += System.currentTimeMillis();
                 System.out.println("**Cashier " + cashierID + " finished customer " + customer.getId() + "**");
             }
         }
@@ -46,9 +51,15 @@ public class Cashiers extends Thread{
     public long getWaitTime() {
         return waitTime;
     }
-
+    public long getDownTime(){
+        return downTime/gotCustomer;
+    }
     @Override
     public String toString(){
         return "Cashier " + cashierID;
+    }
+
+    public int getGotCustomer() {
+        return gotCustomer;
     }
 }

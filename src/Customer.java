@@ -9,6 +9,10 @@ public class Customer extends Thread {
     private long minShopTime = 3000;   //the min time in ms the customer shops
     private long maxShopTime = 20000;   //the max time in ms the customer shops
 
+    private long startTime;
+    private long endTime;
+    private long startWait;
+    private long endWait;
     public Customer(){
         id = nextID;
         nextID++;
@@ -24,9 +28,11 @@ public class Customer extends Thread {
 
     @Override
     public void run(){
+        startTime = System.currentTimeMillis();
         leaveTime = enterTime+shopTime;
        while(leaveTime > System.currentTimeMillis()){
        }
+       endTime = System.currentTimeMillis();
        System.out.println(this.toString() + " is done shopping with shop time " + shopTime);
     }
 
@@ -42,4 +48,15 @@ public class Customer extends Thread {
     public long getId() {
         return id;
     }
+    public long getProcessTime(){
+        return endTime - startTime;
+    }
+    public void startWait(){
+        startWait = System.currentTimeMillis();
+    }
+    public void endWait(){
+        endWait = System.currentTimeMillis();
+        CustomerFactory.avgWaitTime += endWait-startWait;
+    }
+
 }

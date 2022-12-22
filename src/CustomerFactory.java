@@ -17,6 +17,10 @@ public class CustomerFactory extends Thread{
     private int totalFinishCustomer = 0;
     private int totalCustomer = 0;
     private ArrayList<Cashiers> running = new ArrayList<Cashiers>();
+    private long avgProcessTime=0;
+    public static long avgWaitTime = 0;
+    private long downTime;
+    private int gotCustomer=0;
 
 
     //  CustomerFactory(5000,50,customers,100000,3,3000);
@@ -39,11 +43,9 @@ public class CustomerFactory extends Thread{
             //cashiers.add(new Cashiers(waitCashier,i));
             cashiers.add(cc);
             cc.start();
-
         }
         nextAttempt = System.currentTimeMillis() + this.timeSlice;
     }
-
     @Override
     public void run(){
         long start = System.currentTimeMillis();
@@ -67,9 +69,11 @@ public class CustomerFactory extends Thread{
             for(int i =0; i<customers.size(); i++){
                 if(!customers.get(i).isAlive()){
 //                    System.out.println(customers.get(i).toString() + " is moved to Queue");
+                    customers.get(i).startWait();
                     customerCheck.add(customers.get(i));
                     totalShopTime += customers.get(i).getShopTime();
                     totalFinishCustomer++;
+                    avgProcessTime += customers.get(i).getProcessTime();
                     customers.remove(i);
                 }
             }
@@ -101,12 +105,16 @@ public class CustomerFactory extends Thread{
         for(Cashiers cashier : cashiers){
             cashier.setJobDone(true);
         }
-        System.out.println(totalCustomer);//Total customers
-        System.out.println(numCashiers);//Total number of Cashiers used
-        System.out.println(totalShopTime/totalFinishCustomer);//Average shop time per customer
-        System.out.println();//Average process time per customer
-        System.out.println();//Average wait time in the Queue per customer
-        System.out.println();//Average down-time per Cashier
+        for(Cashiers cashier : cashiers){
+            downTime += cashier.getDownTime();
+            gotCustomer += cashier.getGotCustomer();
+        }
+        System.out.println("Total customers: "+totalCustomer);//Total customers
+        System.out.println("Total number of Cashiers used: "+numCashiers);//Total number of Cashiers used
+        System.out.println("Average shop time per customer: "+totalShopTime/totalFinishCustomer);//Average shop time per customer
+        System.out.println("Average process time per customer: "+avgProcessTime/totalFinishCustomer);//Average process time per customer
+        System.out.println("Average wait time in the Queue per customer: "+avgWaitTime/totalFinishCustomer);//Average wait time in the Queue per customer
+        System.out.println("Average down-time per Cashier: "+downTime/gotCustomer);//Average down-time per Cashier
 
     }
 }
